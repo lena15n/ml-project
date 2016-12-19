@@ -110,9 +110,10 @@ public class LungCancerClassification {
             data.defineSourceColumn("Forced vital capacity - FVC", 0, ColumnType.continuous);
             data.defineSourceColumn("Volume", 1, ColumnType.continuous);
             data.defineSourceColumn("Age at surgery", 2, ColumnType.continuous);
+            data.defineSourceColumn("DGN", 3, ColumnType.nominal);
 
             // Define the column that we are trying to predict.
-            ColumnDefinition outputColumn = data.defineSourceColumn("1 year survival period", 3,
+            ColumnDefinition outputColumn = data.defineSourceColumn("1 year survival period", 4,
                     ColumnType.nominal);
 
             // Analyze the data, determine the min/max/mean/sd of every column.
@@ -166,7 +167,7 @@ public class LungCancerClassification {
             // class.  After you train, you can save the NormalizationHelper to later
             // normalize and denormalize your data.
             ReadCSV csv = new ReadCSV(lungCancerDataFile, false, CSVFormat.DECIMAL_POINT);
-            String[] line = new String[3];
+            String[] line = new String[4];
             MLData input = helper.allocateInputVector();
 
             while (csv.next()) {
@@ -174,7 +175,8 @@ public class LungCancerClassification {
                 line[0] = csv.get(0);
                 line[1] = csv.get(1);
                 line[2] = csv.get(2);
-                String correct = csv.get(3);
+                line[3] = csv.get(3);
+                String correct = csv.get(4);
                 helper.normalizeInputVector(line, input.getData(), false);
                 MLData output = bestMethod.compute(input);
                 String prediction = helper.denormalizeOutputVectorToString(output)[0];
