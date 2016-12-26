@@ -41,13 +41,6 @@
             <artifactId>gson</artifactId>
             <version>2.2.4</version>
         </dependency>
-
-        <!-- for calculations -->
-        <dependency>
-            <groupId>org.encog</groupId>
-            <artifactId>encog-core</artifactId>
-            <version>3.3.0</version>
-        </dependency>
     </dependencies>
 
     <build>
