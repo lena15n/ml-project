@@ -181,11 +181,11 @@ public class NNetwork {
         }
 //        2. PRE4: Forced vital capacity - FVC (numeric)
         double fvcMean = 3.28163;//3.281638298;
-        input[7] = Double.valueOf(initialInput[1]) - fvcMean; // (value - MO)
+        input[7] = Math.pow(Double.valueOf(initialInput[1]) - fvcMean, 2) / 6.3; // (value - MO)
 
 //        3. PRE5: Volume that has been exhaled at the end of the first second of forced expiration - FEV1 (numeric)
         double volumeMean = 4.56870;//4.568702128;
-        input[8] = Double.valueOf(initialInput[2]) - volumeMean; // (value - MO)
+        input[8] = Math.pow(Double.valueOf(initialInput[2]) - volumeMean, 2) / 86.3; // (value - MO)
 
 //        4. PRE6: Performance status - Zubrod scale (PRZ2,PRZ1,PRZ0)
         switch (initialInput[3]) {//TODO: мб поменять порядок
@@ -309,7 +309,7 @@ public class NNetwork {
 
 //        16. AGE: Age at surgery (numeric)
         double ageMean = 62.53404;//62.53404255;
-        input[31] = Double.valueOf(initialInput[15]) - ageMean; // (value - MO)
+        input[31] = Math.pow(Double.valueOf(initialInput[15]) - ageMean, 2) / 87; // (value - MO)
 
 
         return input;
@@ -343,7 +343,7 @@ public class NNetwork {
         for (i = outputIndex; i < neuronCount; i++) {
             error[i] = ideal[i - outputIndex] - fire[i];
             globalError += error[i] * error[i];
-            errorDelta[i] = error[i] * fire[i] * (1 - fire[i]);
+            errorDelta[i] = error[i] * fire[i] * (1 - fire[i]); // * производная функции активации
         }
 
         // hidden layer errors
