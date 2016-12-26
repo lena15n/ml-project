@@ -10,18 +10,12 @@ public class Testing {
     private static final int INPUT_N = 470;
     private static final int FEATURES_N = 16;
     private static final String DATA_URL = "http://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff";
+    private static String[][] input;
+    private static String[][] idealOutputs;
 
     public static void main(String args[]) throws MalformedURLException {
         int rows = 20;
-        String xorInput[][] = readInput(new URL(DATA_URL), rows);/*
-                {
-                        {0.0, 0.0},
-                        {1.0, 0.0},
-                        {0.0, 1.0},
-                        {1.0, 1.0}};*/
-
-
-
+        readInput(new URL(DATA_URL), rows);
         /*double xorIdeal[][] =
                 {{0.0}, {1.0}, {1.0}, {0.0}};
 
@@ -56,8 +50,9 @@ public class Testing {
         }*/
     }
 
-    private static String[][] readInput(URL url, int countOfRows) {
-        String[][] input = new String[countOfRows][];
+    private static void readInput(URL url, int countOfRows) {
+        input = new String[countOfRows][];
+        idealOutputs = new String[1][countOfRows];
         Scanner scanner = null;
         try {
             scanner = new Scanner(new File("D:\\Magistracy\\DES\\machine learning project\\data-lung.txt"));//url.openStream());
@@ -82,10 +77,10 @@ public class Testing {
                 for (int j = 0; j < FEATURES_N; j++) {
                     input[i][j] = tempArray[j];
                 }
+
+                idealOutputs[0][i] = tempArray[FEATURES_N];
                 System.out.println("iter " + i);
             }
         }
-
-        return input;
     }
 }
