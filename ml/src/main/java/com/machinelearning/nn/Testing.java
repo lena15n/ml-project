@@ -1,17 +1,28 @@
 package com.machinelearning.nn;
 
-import java.text.*;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class Testing {
-    public static void main(String args[]) {
-        double xorInput[][] =
+    private static final int INPUT_N = 470;
+    private static final int FEATURES_N = 16;
+    private static final String DATA_URL = "http://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff";
+
+    public static void main(String args[]) throws MalformedURLException {
+        int rows = 20;
+        String xorInput[][] = readInput(new URL(DATA_URL), rows);/*
                 {
                         {0.0, 0.0},
                         {1.0, 0.0},
                         {0.0, 1.0},
-                        {1.0, 1.0}};
+                        {1.0, 1.0}};*/
 
-        double xorIdeal[][] =
+
+
+        /*double xorIdeal[][] =
                 {{0.0}, {1.0}, {1.0}, {0.0}};
 
         System.out.println("Learn:");
@@ -42,6 +53,39 @@ public class Testing {
 
             double out[] = network.computeOutputs(xorInput[i]);
             System.out.println("=" + out[0]);
+        }*/
+    }
+
+    private static String[][] readInput(URL url, int countOfRows) {
+        String[][] input = new String[countOfRows][];
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new File("D:\\Magistracy\\DES\\machine learning project\\data-lung.txt"));//url.openStream());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        if (scanner != null) {
+            String line;
+            try {
+                while ((line = scanner.nextLine()) != null && (line.charAt(0) == '@' || line.equals(""))) {
+                    scanner.nextLine();
+                }
+            } catch (NoSuchElementException e) {
+                System.out.println("Read finish");
+            }
+
+            for (int i = 0; i < countOfRows; i++) {
+                input[i] = new String[FEATURES_N];
+                String[] tempArray = scanner.nextLine().split(",");
+
+                for (int j = 0; j < FEATURES_N; j++) {
+                    input[i][j] = tempArray[j];
+                }
+                System.out.println("iter " + i);
+            }
+        }
+
+        return input;
     }
 }

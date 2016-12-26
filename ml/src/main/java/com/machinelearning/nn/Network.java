@@ -1,119 +1,26 @@
 package com.machinelearning.nn;
 
-import java.util.ArrayList;
-
-/**
- * Neural Network
- * Feedforward Backpropagation Neural Network
- * Written in 2002 by Jeff Heaton(http://www.jeffheaton.com)
- * <p>
- * This class is released under the limited GNU public
- * license (LGPL).
- *
- * @author Jeff Heaton
- * @version 1.0
- */
-
 public class Network {
 
-    /**
-     * The global error for the training.
-     */
     protected double globalError;
-
-    /**
-     * The number of input neurons.
-     */
     protected int inputCount;
-
-    /**
-     * The number of hidden neurons.
-     */
     protected int hiddenCount;
-
-    /**
-     * The number of output neurons
-     */
     protected int outputCount;
-
-    /**
-     * The total number of neurons in the network.
-     */
     protected int neuronCount;
-
-    /**
-     * The number of weights in the network.
-     */
     protected int weightCount;
-
-    /**
-     * The learning rate.
-     */
     protected double learnRate;
-
-    /**
-     * The outputs from the various levels.
-     */
     protected double fire[];
-
-    /**
-     * The weight matrix this, along with the thresholds can be
-     * thought of as the "memory" of the neural network.
-     */
     protected double matrix[];
-
-    /**
-     * The errors from the last calculation.
-     */
     protected double error[];
-
-    /**
-     * Accumulates matrix delta's for training.
-     */
     protected double accMatrixDelta[];
-
-    /**
-     * The thresholds, this value, along with the weight matrix
-     * can be thought of as the memory of the neural network.
-     */
     protected double thresholds[];
-
-    /**
-     * The changes that should be applied to the weight
-     * matrix.
-     */
     protected double matrixDelta[];
-
-    /**
-     * The accumulation of the threshold deltas.
-     */
     protected double accThresholdDelta[];
-
-    /**
-     * The threshold deltas.
-     */
     protected double thresholdDelta[];
-
-    /**
-     * The momentum for training.
-     */
     protected double momentum;
-
-    /**
-     * The changes in the errors.
-     */
     protected double errorDelta[];
 
 
-    /**
-     * Construct the neural network.
-     *
-     * @param inputCount  The number of input neurons.
-     * @param hiddenCount The number of hidden neurons
-     * @param outputCount The number of output neurons
-     * @param learnRate   The learning rate to be used when training.
-     * @param momentum    The momentum to be used when training.
-     */
     public Network(int inputCount,
                    int hiddenCount,
                    int outputCount,
@@ -143,12 +50,7 @@ public class Network {
     }
 
 
-    /**
-     * Returns the root mean square error for a complet training set.
-     *
-     * @param len The length of a complete training set.
-     * @return The current error for the neural network.
-     */
+    //rms
     public double getError(int len) {
         double err = Math.sqrt(globalError / (len * outputCount));
         globalError = 0; // clear the accumulator
@@ -156,23 +58,11 @@ public class Network {
 
     }
 
-    /**
-     * The threshold method. You may wish to override this class to provide other
-     * threshold methods.
-     *
-     * @param sum The activation from the neuron.
-     * @return The activation applied to the threshold method.
-     */
+    //activation func
     public double threshold(double sum) {
-        return 1.0 / (1 + Math.exp(-1.0 * sum));
+        return 1.0 / (1 + Math.exp(-1.0 * sum)); //Sigmoid function
     }
 
-    /**
-     * Compute the output for a given input to the neural network.
-     *
-     * @param input The input provide to the neural network.
-     * @return The results from the output neurons.
-     */
     public double[] computeOutputs(double input[]) {
         int i, j;
         final int hiddenIndex = inputCount;
@@ -212,11 +102,7 @@ public class Network {
     }
 
 
-    /**
-     * Calculate the error for the recogntion just done.
-     *
-     * @param ideal What the output neurons should have yielded.
-     */
+    //ошибка на только вычисленных данных
     public void calcError(double ideal[]) {
         int i, j;
         final int hiddenIndex = inputCount;
