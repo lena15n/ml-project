@@ -32,18 +32,25 @@ public class Program {
     }
 
     public void calculate() throws MalformedURLException {
-        int rows = 100;
-        readInput(new URL(DATA_URL), rows);
-
-        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.2, 0.01);
-        input = new double[rows][];
-        idealOutputs = new double[rows][];
         accuracy = new ArrayList<>();
         precision = new ArrayList<>();
 
+        calculateForNrows(100);
+        calculateForNrows(200);
+        calculateForNrows(300);
+        calculateForNrows(400);
+        /*//CV
+        for (int i = 0; i <)*/
+    }
+
+    private void calculateForNrows(int nRows) throws MalformedURLException {
+        readInput(new URL(DATA_URL), nRows);
+        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.2, 0.01);
+        input = new double[nRows][];
+        idealOutputs = new double[nRows][];
 
 
-        for (int i = 0; i < rows; i++) {
+        for (int i = 0; i < nRows; i++) {
             input[i] = new double[FEATURES_N];
             idealOutputs[i] = new double[1];
             input[i] = network.normalizeInputData(initialInput[i]);
@@ -53,7 +60,7 @@ public class Program {
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
         percentFormat.setMinimumFractionDigits(4);
 
-        for (int i = 0; i < 10000; i++) {//500 000
+        for (int i = 0; i < 200; i++) {//500 000
             for (int j = 0; j < input.length; j++) {
                 network.computeOutputs(input[j]);
                 network.calcError(idealOutputs[j]);
@@ -64,7 +71,7 @@ public class Program {
         }
 
         System.out.println("Recall:");
-        double[][] out = new double[rows][];
+        double[][] out = new double[nRows][];
         int tp = 0, fp = 0, fn = 0, tn = 0;
 
         for (int i = 0; i < input.length; i++) {
@@ -81,25 +88,17 @@ public class Program {
             } else if (out[i][0] < 0.5 && idealOutputs[i][0] < 0.5) {// predict: survive, real: survive
                 tn++;
             }
-
         }
 
-
-
         //accuracy = (TP+TN)/(TP+TN+FP+FN)
-        accuracy.add((double)rows);
+        accuracy.add((double)nRows);
         accuracy.add(((tp + tn) * 1.0) / (tp + tn + fp + fn));
         System.out.println("accur: " + accuracy.get(1));
 
         //precision = TP/(TP+FP) (positive predictive value)
-        precision.add((double)rows);
+        precision.add((double)nRows);
         precision.add((tp * 1.0) / (tp + fp));
         System.out.println("prec: " + precision.get(1));
-
-        /*//CV
-        for (int i = 0; i <)*/
-
-
     }
 
     public static ArrayList<Double> getAccuracy() {
