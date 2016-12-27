@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 public class GetTask extends AsyncTask<String, Void, ArrayList<Double>> {
     private MyAsyncResponse delegate = null;
+    private String code;
 
     public GetTask(MyAsyncResponse delegate) {
         this.delegate = delegate;
@@ -25,9 +26,10 @@ public class GetTask extends AsyncTask<String, Void, ArrayList<Double>> {
 
     @Override
     protected ArrayList<Double> doInBackground(String... params) {
-        String urlString = params[0];
-        String login = params[1];
-        String password = params[2];
+        code = params[0];
+        String urlString = params[1];
+        String login = params[2];
+        String password = params[3];
 
         URL url;
         HttpURLConnection httpConnection = null;
@@ -87,11 +89,11 @@ public class GetTask extends AsyncTask<String, Void, ArrayList<Double>> {
 
     @Override
     protected void onPostExecute(ArrayList<Double> data) {
-       delegate.processFinish(data);
+       delegate.processFinish(code, data);
     }
 
     public interface MyAsyncResponse {
-        void processFinish(ArrayList<Double> data);
+        void processFinish(String code, ArrayList<Double> data);
     }
 
     private ArrayList<Double> getDataFromJSON(String json) {

@@ -11,11 +11,38 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lena.mlapplication.MainActivity">
 
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/draw_button"/>
+  <!--  <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/ScrollView01"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">-->
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_accuracy"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
+
+            <!--<Button
+                android:id="@+id/draw_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="@string/button_draw"/>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_accuracy"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart_precision"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"/>-->
+      <!--  </RelativeLayout>
+    </ScrollView>-->
 </RelativeLayout>
