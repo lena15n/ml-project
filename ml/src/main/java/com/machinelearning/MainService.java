@@ -1,5 +1,7 @@
 package com.machinelearning;
 
+import com.google.gson.Gson;
+
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
@@ -17,13 +19,26 @@ public class MainService {
 
     @RolesAllowed("ADMIN")
     @GET
-    @Produces("application/json;charset=UTF-8")
-    public List<String> getResult() {
-        ArrayList<String> records = new ArrayList<>();
+    @Path("/accuracy")
+    @Produces("text/plain")//("application/json;charset=UTF-8")
+    public String getResult() {
+        ArrayList<Double> list = new ArrayList<>();
+        list.add(10.0);
+        list.add(15.0);
+        list.add(15.0);
+        list.add(14.0);
+        list.add(20.0);
+        list.add(7.0);
+        list.add(25.0);
+        list.add(4.0);
+        list.add(30.0);
+        list.add(6.0);
+        list.add(35.0);
+        list.add(2.0);
 
         //TODO: return result of calculations
+        String json = new Gson().toJson(list);
 
-
-        return records;
+        return json;
     }
 }

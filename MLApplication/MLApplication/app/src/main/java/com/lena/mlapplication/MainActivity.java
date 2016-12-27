@@ -33,28 +33,11 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
         drawButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<Double> list = new ArrayList<>();
-                list.add(10.0);
-                list.add(15.0);
-                list.add(15.0);
-                list.add(14.0);
-                list.add(20.0);
-                list.add(7.0);
-                list.add(25.0);
-                list.add(4.0);
-                list.add(30.0);
-                list.add(6.0);
-                list.add(35.0);
-                list.add(2.0);
 
-                draw(R.id.chart_accuracy, "Accuracy", list);
+
                 drawButton.setVisibility(View.INVISIBLE);
-                RelativeLayout accuracy_layout = (RelativeLayout) findViewById(R.id.chart_accuracy_layout);
-                accuracy_layout.setVisibility(View.VISIBLE);
 
-                RelativeLayout precision_layout = (RelativeLayout) findViewById(R.id.chart_precision_layout);
-                precision_layout.setVisibility(View.VISIBLE);
-                // new GetTask(MainActivity.this).execute(RECEIVE_ACCURACY_DATA, URL + "accuracy", LOGIN, PASSWORD);
+                new GetTask(MainActivity.this).execute(RECEIVE_ACCURACY_DATA, URL + "accuracy", LOGIN, PASSWORD);
                 // new GetTask(MainActivity.this).execute(RECEIVE_PRECISION_DATA, URL + "precision", LOGIN, PASSWORD);
             }
         });
@@ -64,8 +47,15 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
     public void processFinish(String code, ArrayList<Double> data) {
         if (code.equals(RECEIVE_ACCURACY_DATA)) {
             accuracyData = data;
+            draw(R.id.chart_accuracy, "Accuracy", accuracyData);
+            RelativeLayout accuracy_layout = (RelativeLayout) findViewById(R.id.chart_accuracy_layout);
+            accuracy_layout.setVisibility(View.VISIBLE);
+
         } else if (code.equals(RECEIVE_PRECISION_DATA)) {
             precisionData = data;
+
+            RelativeLayout precision_layout = (RelativeLayout) findViewById(R.id.chart_precision_layout);
+            precision_layout.setVisibility(View.VISIBLE);
         }
     }
 
