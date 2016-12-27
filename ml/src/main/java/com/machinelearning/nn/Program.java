@@ -4,11 +4,12 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Program {
-    private static final int ALL_ROWS_N = 470;
+    private static final int ALL_ROWS_N = 468;//470
     private static final int INITIAL_FEATURES_N = 16;
     private static final int FEATURES_N = 32;
     private static final String DATA_URL = "http://archive.ics.uci.edu/ml/machine-learning-databases/00277/ThoraricSurgery.arff";
@@ -19,7 +20,98 @@ public class Program {
     private static double[][] input;
     private static double[][] idealOutputs;
 
-    public static void main(String args[]) throws MalformedURLException {
+    private static ArrayList<Double> accuracy;
+    private static ArrayList<Double> precision;
+
+    public Program() {
+        try {
+            calculate();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void calculate() throws MalformedURLException {
+        int rows = 100;
+        readInput(new URL(DATA_URL), rows);
+
+        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.2, 0.01);
+        input = new double[rows][];
+        idealOutputs = new double[rows][];
+        accuracy = new ArrayList<>();
+        precision = new ArrayList<>();
+
+
+
+        for (int i = 0; i < rows; i++) {
+            input[i] = new double[FEATURES_N];
+            idealOutputs[i] = new double[1];
+            input[i] = network.normalizeInputData(initialInput[i]);
+            idealOutputs[i] = network.normalizeOutputData(initialIdealOutputs[i]);
+        }
+
+        NumberFormat percentFormat = NumberFormat.getPercentInstance();
+        percentFormat.setMinimumFractionDigits(4);
+
+        for (int i = 0; i < 10000; i++) {//500 000
+            for (int j = 0; j < input.length; j++) {
+                network.computeOutputs(input[j]);
+                network.calcError(idealOutputs[j]);
+                network.learn();
+            }
+            System.out.println("Iter №" + i + ": error = " +
+                    percentFormat.format(network.getError(input.length)));
+        }
+
+        System.out.println("Recall:");
+        double[][] out = new double[rows][];
+        int tp = 0, fp = 0, fn = 0, tn = 0;
+
+        for (int i = 0; i < input.length; i++) {
+            out[i] = new double[1];
+            out[i] = network.computeOutputs(input[i]);
+            System.out.println("=" + String.format("%4.4f", out[i][0]));
+
+            if (out[i][0] > 0.5 && idealOutputs[i][0] < 0.5) {// predict: death, real: survive
+                fp++;
+            } else if (out[i][0] > 0.5 && idealOutputs[i][0] > 0.5) {// predict: death, real: death
+                tp++;
+            } else if (out[i][0] < 0.5 && idealOutputs[i][0] > 0.5) {// predict: survive, real: death
+                fn++;
+            } else if (out[i][0] < 0.5 && idealOutputs[i][0] < 0.5) {// predict: survive, real: survive
+                tn++;
+            }
+
+        }
+
+
+
+        //accuracy = (TP+TN)/(TP+TN+FP+FN)
+        accuracy.add((double)rows);
+        accuracy.add(((tp + tn) * 1.0) / (tp + tn + fp + fn));
+        System.out.println("accur: " + accuracy.get(1));
+
+        //precision = TP/(TP+FP) (positive predictive value)
+        precision.add((double)rows);
+        precision.add((tp * 1.0) / (tp + fp));
+        System.out.println("prec: " + precision.get(1));
+
+        /*//CV
+        for (int i = 0; i <)*/
+
+
+    }
+
+    public static ArrayList<Double> getAccuracy() {
+        return accuracy;
+    }
+
+    public static ArrayList<Double> getPrecision() {
+        return precision;
+    }
+
+
+    /*public static void main(String args[]) throws MalformedURLException {
         int rows = 468;//20;
         readInput(new URL(DATA_URL), rows);
 
@@ -58,7 +150,7 @@ public class Program {
             double[] out = network.computeOutputs(input[i]);
             System.out.println("=" + String.format("%4.4f", out[0]));
         }
-    }
+    }*/
 
     private static void readInput(URL url, int countOfRows) {
         initialInput = new String[countOfRows][];
