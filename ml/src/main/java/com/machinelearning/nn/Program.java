@@ -22,8 +22,8 @@ public class Program {
     public static void main(String args[]) throws MalformedURLException {
         int rows = 468;//20;
         readInput(new URL(DATA_URL), rows);
-
-        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.3, 0.01);//FEATURES_N, FEATURES_N + 1, 1, 0.7, 0.9);
+        
+        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.2, 0.01);//FEATURES_N, FEATURES_N + 1, 1, 0.7, 0.9);
         input = new double[rows][];
         idealOutputs = new double[rows][];
 

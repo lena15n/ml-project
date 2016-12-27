@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MLApplication</string>
+    <string name="button_draw">Draw graphics</string>
+</resources>
