@@ -1,5 +1,6 @@
 package com.lena.mlapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
     private static final String PASSWORD = "admin";
     private ArrayList<Double> accuracyData;
     private ArrayList<Double> precisionData;
+    private int graphic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +69,18 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
         }
 
         LineDataSet dataset = new LineDataSet(entries, label);
+        if (graphic > 0) {
+            dataset.setColor(Color.GREEN);
+            dataset.setCircleColor(Color.GREEN);
+        }
         LineData lineData = new LineData(dataset);
         lineChart.setData(lineData);
+
         Description desc = new Description();
         desc.setText("");
         lineChart.setDescription(desc);
         lineChart.invalidate();
 
+        graphic++;
     }
 }
