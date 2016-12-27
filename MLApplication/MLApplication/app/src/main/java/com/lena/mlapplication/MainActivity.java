@@ -33,12 +33,10 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
         drawButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 drawButton.setVisibility(View.INVISIBLE);
 
                 new GetTask(MainActivity.this).execute(RECEIVE_ACCURACY_DATA, URL + "accuracy", LOGIN, PASSWORD);
-                // new GetTask(MainActivity.this).execute(RECEIVE_PRECISION_DATA, URL + "precision", LOGIN, PASSWORD);
+                new GetTask(MainActivity.this).execute(RECEIVE_PRECISION_DATA, URL + "precision", LOGIN, PASSWORD);
             }
         });
     }
@@ -53,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
 
         } else if (code.equals(RECEIVE_PRECISION_DATA)) {
             precisionData = data;
-
+            draw(R.id.chart_precision, "Precision", precisionData);
             RelativeLayout precision_layout = (RelativeLayout) findViewById(R.id.chart_precision_layout);
             precision_layout.setVisibility(View.VISIBLE);
         }
