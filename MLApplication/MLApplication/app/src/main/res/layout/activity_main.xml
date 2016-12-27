@@ -11,7 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lena.mlapplication.MainActivity">
 
-  <!--  <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/ScrollView01"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
@@ -19,14 +19,9 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">-->
+            android:orientation="vertical">
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart_accuracy"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"/>
-
-            <!--<Button
+            <Button
                 android:id="@+id/draw_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -34,15 +29,32 @@
                 android:layout_centerVertical="true"
                 android:text="@string/button_draw"/>
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart_accuracy"
+            <RelativeLayout
+                android:id="@+id/chart_accuracy_layout"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="invisible">
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart_precision"
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart_accuracy"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/chart_precision_layout"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"/>-->
-      <!--  </RelativeLayout>
-    </ScrollView>-->
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/chart_accuracy_layout"
+                android:orientation="vertical"
+                android:visibility="invisible">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/chart_precision"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"/>
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

@@ -2,6 +2,9 @@ package com.lena.mlapplication;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -26,16 +29,35 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        draw(R.id.chart_accuracy, "Accuracy", new ArrayList<Double>());
-       /* Button drawButton = (Button) findViewById(R.id.draw_button);
+        final Button drawButton = (Button) findViewById(R.id.draw_button);
         drawButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                draw(R.id.chart_accuracy, "ПРивет", new ArrayList<Double>());
+                ArrayList<Double> list = new ArrayList<>();
+                list.add(10.0);
+                list.add(15.0);
+                list.add(15.0);
+                list.add(14.0);
+                list.add(20.0);
+                list.add(7.0);
+                list.add(25.0);
+                list.add(4.0);
+                list.add(30.0);
+                list.add(6.0);
+                list.add(35.0);
+                list.add(2.0);
+
+                draw(R.id.chart_accuracy, "Accuracy", list);
+                drawButton.setVisibility(View.INVISIBLE);
+                RelativeLayout accuracy_layout = (RelativeLayout) findViewById(R.id.chart_accuracy_layout);
+                accuracy_layout.setVisibility(View.VISIBLE);
+
+                RelativeLayout precision_layout = (RelativeLayout) findViewById(R.id.chart_precision_layout);
+                precision_layout.setVisibility(View.VISIBLE);
                 // new GetTask(MainActivity.this).execute(RECEIVE_ACCURACY_DATA, URL + "accuracy", LOGIN, PASSWORD);
                 // new GetTask(MainActivity.this).execute(RECEIVE_PRECISION_DATA, URL + "precision", LOGIN, PASSWORD);
             }
-        });*/
+        });
     }
 
     @Override
@@ -50,22 +72,13 @@ public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncRe
     private void draw(int id, String label, ArrayList<Double> data) {
         LineChart lineChart = (LineChart) findViewById(id);
         ArrayList<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0f, 17));//x y
-        entries.add(new Entry(1f, 22));
-        entries.add(new Entry(2f, 10));
-        entries.add(new Entry(3f, 7));
-        entries.add(new Entry(4f, 8));
-        entries.add(new Entry(5f, 5));
+        int i = 0;
+        while (i < data.size() - 1) {
+            entries.add(new Entry(data.get(i).floatValue(), data.get(i + 1).floatValue()));
+            i += 2;
+        }
 
         LineDataSet dataset = new LineDataSet(entries, label);
-        ArrayList<String> labels = new ArrayList<>();
-        labels.add("100");
-        labels.add("1000");
-        labels.add("10000");
-        labels.add("100000");
-        labels.add("1000000");
-        labels.add("10000000");
-
         LineData lineData = new LineData(dataset);
         lineChart.setData(lineData);
         Description desc = new Description();
