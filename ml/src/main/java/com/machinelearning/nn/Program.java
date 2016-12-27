@@ -23,7 +23,7 @@ public class Program {
         int rows = 468;//20;
         readInput(new URL(DATA_URL), rows);
 
-        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.7, 0.6);//FEATURES_N, FEATURES_N + 1, 1, 0.7, 0.9);
+        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.3, 0.1);//FEATURES_N, FEATURES_N + 1, 1, 0.7, 0.9);
         input = new double[rows][];
         idealOutputs = new double[rows][];
 
@@ -37,7 +37,7 @@ public class Program {
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
         percentFormat.setMinimumFractionDigits(4);
 
-        for (int i = 0; i < 40000; i++) {//10000
+        for (int i = 0; i < 500000; i++) {//10000
             for (int j = 0; j < input.length; j++) {
                 network.computeOutputs(input[j]);
                 network.calcError(idealOutputs[j]);
