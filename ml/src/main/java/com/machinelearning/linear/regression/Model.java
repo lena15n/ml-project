@@ -44,26 +44,27 @@ public class Model {
         }
 
         double[][] transpInput = transp(input);
-        //double[][] mul = multMatrices(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}}, tr);
-        findBetta(multMatrices(transp(input), input), idealOutputs[0]);
+        double[][] invertMatr = findInvertibleMatr(multMatrices(transpInput, input));
+        double[][] bettas = multMatrices(multMatrices(invertMatr, transpInput), idealOutputs);
+
 
 
     }
 
-    private void findBetta(double[][] matr, double[] rhs) {
-        //double[][] e = new double[][] {{1,0,0,0,0,0,0},{0,1,0,0,0,0,0},{0,0,1,0,0,0,0},{0,0,0,1,0,0,0},{0,0,0,0,1,0,0},{0,0,0,0,0,1,0},{0,0,0,0,0,0,1}};
-        double[][] e = new double[][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        matr = new double[][]{{1,4,5}, {3,4,2}, {9,8,7}};
+    private double[][] findInvertibleMatr(double[][] matr) {
+        double[][] invertMatr = new double[matr.length][matr.length];
+        for (int i = 0; i < invertMatr.length; i++) {
+            for (int j = 0; j < invertMatr.length; j++) {
+                invertMatr[i][j] = i == j ? 1 : 0;
+            }
+        }
 
-        RealMatrix a = new Array2DRowRealMatrix(matr);
-        RealMatrix y = new Array2DRowRealMatrix(e);
-        System.out.println("a matrix: " + a);
-        DecompositionSolver solver = new LUDecomposition(a).getSolver();
+        RealMatrix matrix = new Array2DRowRealMatrix(matr);
+        RealMatrix y = new Array2DRowRealMatrix(invertMatr);
+        DecompositionSolver solver = new LUDecomposition(matrix).getSolver();
+        RealMatrix invertM = solver.solve(y);
 
-        RealMatrix x = solver.solve(y);
-        System.out.println("solution x: " + x);
-
-
+        return invertM.getData();
     }
 
     private double[][] transp(double[][] matr) {
