@@ -1,6 +1,7 @@
 package com.machinelearning;
 
 import com.google.gson.Gson;
+import com.machinelearning.linear.regression.Model;
 import com.machinelearning.nn.Program;
 
 import javax.annotation.security.RolesAllowed;
@@ -14,9 +15,11 @@ import java.util.List;
 @Path("/result")
 public class MainService {
     Program tool;
+    Model model;
 
     public MainService() {
         tool = new Program();
+        model = new Model();
     }
 
     @RolesAllowed("ADMIN")
@@ -24,6 +27,7 @@ public class MainService {
     @Path("/accuracy")
     @Produces("text/plain")
     public String getAccuracy() {
+        //
         ArrayList<Double> list = tool.getAccuracy();
         /*= new ArrayList<>();
         list.add(10.0);
