@@ -4,11 +4,10 @@ import org.apache.commons.math3.linear.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Model {
-    private ArrayList<Double> bettas;
+    private double[][] bettas;
     private int featuresN = 7;
     private static final int ALL_ROWS_N = 209;
     private String[][] initialInput;
@@ -19,24 +18,60 @@ public class Model {
     }
 
     private void calculate() {
-        bettas = new ArrayList<>();
+        int position = 0;
         int inputCount = ALL_ROWS_N  * 3 / 4;
-        readInput(inputCount);
+        readInput(inputCount, position);
+        findBettas(initialInput, initialIdealOutputs);
 
-        findBettas();
+        position = inputCount;
+        readInput(ALL_ROWS_N - inputCount, position);
+        test(initialInput, initialIdealOutputs);
     }
 
-    private void findBettas() {
-        double[][] input = new double[initialInput.length][];
-        double[][] idealOutputs = new double[initialIdealOutputs.length][];
+    private void test(String[][] initialInput, String[][] initialIdealOutputs) {
+        double[][] testInput = new double[initialInput.length][featuresN];
+        double[][] testIdealOutputs = new double[initialIdealOutputs.length][1];
 
         for (int row = 0; row < initialInput.length; row++) {
-            input[row] = new double[initialInput[row].length];
-            idealOutputs[row] = new double[1];
-
-            for (int feature = 0; feature < initialInput[row].length; feature++) {
+            for (int feature = 0; feature < featuresN; feature++) {
                 System.out.print(initialInput[row][feature] + ",\t");
-                input[row][feature] = Double.valueOf(initialInput[row][feature]);
+                testInput[row][feature] = Double.valueOf(initialInput[row][feature]);
+            }
+
+            System.out.println("result: " + initialIdealOutputs[row][0]);
+            testIdealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
+        }
+
+        double estim = 0.0;
+
+        for (int i = 0; i < testInput.length; i++) {
+            estim += bettas[0][0];
+
+            for (int j = 0; j < testInput[0].length; j++) {
+                estim += bettas[j + 1][0] * testInput[i][j];
+            }
+
+            int resultMax = 1238;
+            double resultMean = 99.3;
+            double error = (testIdealOutputs[i][0] - estim) / resultMean;
+            System.out.println("Ideal:\t" + testIdealOutputs[i][0] + ", Estim:\t" + estim + ", Error:\t" + error);
+            estim = 0;
+        }
+    }
+
+    private void findBettas(String[][] initialInput, String[][] initialIdealOutputs) {
+        double[][] input = new double[initialInput.length][];
+        double[][] idealOutputs = new double[initialIdealOutputs.length][];
+        int columnsN = initialInput[0].length + 1;
+
+        for (int row = 0; row < initialInput.length; row++) {
+            input[row] = new double[columnsN];// 1 1 1 1 - vector
+            idealOutputs[row] = new double[1];
+            input[row][0] = 1;
+
+            for (int feature = 1; feature < columnsN; feature++) {
+                System.out.print(initialInput[row][feature - 1] + ",\t");
+                input[row][feature] = Double.valueOf(initialInput[row][feature - 1]);
             }
 
             System.out.println("result: " + initialIdealOutputs[row][0]);
@@ -45,10 +80,7 @@ public class Model {
 
         double[][] transpInput = transp(input);
         double[][] invertMatr = findInvertibleMatr(multMatrices(transpInput, input));
-        double[][] bettas = multMatrices(multMatrices(invertMatr, transpInput), idealOutputs);
-
-
-
+        bettas = multMatrices(multMatrices(invertMatr, transpInput), idealOutputs);
     }
 
     private double[][] findInvertibleMatr(double[][] matr) {
@@ -97,7 +129,7 @@ public class Model {
         return multMatr;
     }
 
-    public ArrayList<Double> getBettas() {
+    public double[][] getBettas() {
         return bettas;
     }
 
@@ -105,7 +137,7 @@ public class Model {
         new Model();
     }
 
-    private void readInput(int countOfRows) {
+    private void readInput(int countOfRows, int position) {
         initialInput = new String[countOfRows][];
         initialIdealOutputs = new String[countOfRows][1];
         Scanner scanner = null;
@@ -116,6 +148,13 @@ public class Model {
         }
 
         if (scanner != null) {
+            int k = 0;
+
+            while (k < position) {
+                scanner.nextLine();
+                k++;
+            }
+
             for (int i = 0; i < countOfRows; i++) {
                 initialInput[i] = new String[featuresN];
                 String[] tempArray = scanner.nextLine().split(",");
