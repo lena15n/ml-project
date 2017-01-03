@@ -41,9 +41,41 @@ public class Model {
             idealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
         }
 
-        
+
+        double[][] tr = transp(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}});//input
+        double[][] mul = multMatrices(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}}, tr);
 
 
+    }
+
+    private double[][] transp(double[][] matr) {
+        double[][] transpMatr = new double[matr[0].length][matr.length];
+
+        for (int i = 0; i < matr.length; i++) {
+            for (int j = 0; j < matr[i].length; j++) {
+                transpMatr[j][i] = matr[i][j];
+            }
+        }
+
+        return transpMatr;
+    }
+
+    private double[][] multMatrices (double[][] matrA, double[][] matrB) {
+        double[][] multMatr = new double[matrA.length][matrB[0].length];
+
+        for (int i = 0; i < matrA.length; i++) {
+            for (int j = 0; j < matrB[0].length; j++){
+                double sum = 0.0;
+
+                for (int k = 0; k < matrA[0].length; k++) { // or matrB.len
+                    sum += matrA[i][k] * matrB[k][j];
+                }
+
+                multMatr[i][j] = sum;
+            }
+        }
+
+        return multMatr;
     }
 
     public ArrayList<Double> getBettas() {
