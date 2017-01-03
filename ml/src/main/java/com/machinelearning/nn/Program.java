@@ -35,10 +35,16 @@ public class Program {
         accuracy = new ArrayList<>();
         precision = new ArrayList<>();
 
+        calculateForNrows(50);
         calculateForNrows(100);
+        calculateForNrows(150);
         calculateForNrows(200);
+        calculateForNrows(250);
         calculateForNrows(300);
+        calculateForNrows(350);
         calculateForNrows(400);
+        calculateForNrows(450);
+
         /*//CV
         for (int i = 0; i <)*/
     }
@@ -48,7 +54,6 @@ public class Program {
         NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.2, 0.01);
         input = new double[nRows][];
         idealOutputs = new double[nRows][];
-
 
         for (int i = 0; i < nRows; i++) {
             input[i] = new double[FEATURES_N];
@@ -60,7 +65,7 @@ public class Program {
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
         percentFormat.setMinimumFractionDigits(4);
 
-        for (int i = 0; i < 200; i++) {//500 000
+        for (int i = 0; i < 2500; i++) {//500 000
             for (int j = 0; j < input.length; j++) {
                 network.computeOutputs(input[j]);
                 network.calcError(idealOutputs[j]);

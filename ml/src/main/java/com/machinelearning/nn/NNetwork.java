@@ -309,7 +309,7 @@ public class NNetwork {
 
 //        16. AGE: Age at surgery (numeric)
         double ageMean = 62.53404;//62.53404255;
-        input[31] =Double.valueOf(initialInput[15]) / 87; // (value - MO)
+        input[31] = Double.valueOf(initialInput[15]) / 87; // (value - MO)
 
 
         return input;

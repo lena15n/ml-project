@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements GetTask.MyAsyncResponse {
     private static final String RECEIVE_ACCURACY_DATA = "1";
     private static final String RECEIVE_PRECISION_DATA = "2";
-    private static final String URL = "http://d677e500.ngrok.io/machinelearning-0.0.1-SNAPSHOT/machine-learning/result/";
+    private static final String URL = "http://979b9e4c.ngrok.io/machinelearning-0.0.1-SNAPSHOT/machine-learning/result/";
     private static final String LOGIN = "user";
     private static final String PASSWORD = "admin";
     private ArrayList<Double> accuracyData;
