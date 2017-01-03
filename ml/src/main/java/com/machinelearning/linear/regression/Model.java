@@ -2,9 +2,7 @@ package com.machinelearning.linear.regression;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Model {
@@ -27,13 +25,25 @@ public class Model {
     }
 
     private void findBettas() {
+        double[][] input = new double[initialInput.length][];
+        double[][] idealOutputs = new double[initialIdealOutputs.length][];
+
         for (int row = 0; row < initialInput.length; row++) {
+            input[row] = new double[initialInput[row].length];
+            idealOutputs[row] = new double[1];
+
             for (int feature = 0; feature < initialInput[row].length; feature++) {
                 System.out.print(initialInput[row][feature] + ",\t");
+                input[row][feature] = Double.valueOf(initialInput[row][feature]);
             }
 
             System.out.println("result: " + initialIdealOutputs[row][0]);
+            idealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
         }
+
+        
+
+
     }
 
     public ArrayList<Double> getBettas() {
@@ -63,7 +73,7 @@ public class Model {
                     initialInput[i][j] = tempArray[j + 2]; //не учитываем первые два признака
                 }
 
-                initialIdealOutputs[i][0] = tempArray[featuresN];
+                initialIdealOutputs[i][0] = tempArray[featuresN + 2];
             }
         }
     }
