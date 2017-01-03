@@ -1,5 +1,7 @@
 package com.machinelearning.linear.regression;
 
+import org.apache.commons.math3.linear.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,9 +43,25 @@ public class Model {
             idealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
         }
 
+        double[][] transpInput = transp(input);
+        //double[][] mul = multMatrices(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}}, tr);
+        findBetta(multMatrices(transp(input), input), idealOutputs[0]);
 
-        double[][] tr = transp(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}});//input
-        double[][] mul = multMatrices(new double[][]{{1,2,3}, {6,5,4}, {9,10,11}}, tr);
+
+    }
+
+    private void findBetta(double[][] matr, double[] rhs) {
+        //double[][] e = new double[][] {{1,0,0,0,0,0,0},{0,1,0,0,0,0,0},{0,0,1,0,0,0,0},{0,0,0,1,0,0,0},{0,0,0,0,1,0,0},{0,0,0,0,0,1,0},{0,0,0,0,0,0,1}};
+        double[][] e = new double[][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        matr = new double[][]{{1,4,5}, {3,4,2}, {9,8,7}};
+
+        RealMatrix a = new Array2DRowRealMatrix(matr);
+        RealMatrix y = new Array2DRowRealMatrix(e);
+        System.out.println("a matrix: " + a);
+        DecompositionSolver solver = new LUDecomposition(a).getSolver();
+
+        RealMatrix x = solver.solve(y);
+        System.out.println("solution x: " + x);
 
 
     }
