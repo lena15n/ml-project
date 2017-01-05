@@ -22,7 +22,7 @@ public class Model {
         validationErrors = new ArrayList<>();
         int maxFeaturesN = 14;
 
-        for (int featuresN = 0; featuresN < maxFeaturesN; featuresN++) {
+        for (int featuresN = 1; featuresN < maxFeaturesN; featuresN++) {
             int position = 0;
             int inputCount = ALL_ROWS_N * 3 / 4;
             Object[] inputAndOutput = transformData(readInput(inputCount, position), featuresN);
