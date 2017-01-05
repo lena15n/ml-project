@@ -4,80 +4,71 @@ import org.apache.commons.math3.linear.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Model {
     private double[][] bettas;
-    private int featuresN = 7;
     private static final int ALL_ROWS_N = 209;
-    private String[][] initialInput;
-    private String[][] initialIdealOutputs;
+    private ArrayList<Double> trainErrors;
+    private ArrayList<Double> validationErrors;
 
     public Model() {
         calculate();
     }
 
     private void calculate() {
-        int position = 0;
-        int inputCount = ALL_ROWS_N  * 3 / 4;
-        readInput(inputCount, position);
-        findBettas(initialInput, initialIdealOutputs);
+        trainErrors = new ArrayList<>();
+        validationErrors = new ArrayList<>();
+        int maxFeaturesN = 14;
 
-        position = inputCount;
-        readInput(ALL_ROWS_N - inputCount, position);
-        test(initialInput, initialIdealOutputs);
+        for (int featuresN = 0; featuresN < maxFeaturesN; featuresN++) {
+            int position = 0;
+            int inputCount = ALL_ROWS_N * 3 / 4;
+            Object[] inputAndOutput = transformData(readInput(inputCount, position), featuresN);
+            double[][] input = (double[][]) inputAndOutput[0];
+            double[][] output = (double[][]) inputAndOutput[1];
+            findBettas(input, output);
+
+            inputAndOutput = transformData(readInput(ALL_ROWS_N - inputCount, position), featuresN);
+            input = (double[][]) inputAndOutput[0];
+            output = (double[][]) inputAndOutput[1];
+            trainErrors.add((double) featuresN);
+            trainErrors.add(test(input, output));
+
+            position = inputCount;
+            inputAndOutput = transformData(readInput(ALL_ROWS_N - inputCount, position), featuresN);
+            input = (double[][]) inputAndOutput[0];
+            output = (double[][]) inputAndOutput[1];
+            validationErrors.add((double) featuresN);
+            validationErrors.add(test(input, output));
+        }
+        System.out.println("--finish--");
     }
 
-    private void test(String[][] initialInput, String[][] initialIdealOutputs) {
-        double[][] testInput = new double[initialInput.length][featuresN];
-        double[][] testIdealOutputs = new double[initialIdealOutputs.length][1];
-
-        for (int row = 0; row < initialInput.length; row++) {
-            for (int feature = 0; feature < featuresN; feature++) {
-                System.out.print(initialInput[row][feature] + ",\t");
-                testInput[row][feature] = Double.valueOf(initialInput[row][feature]);
-            }
-
-            System.out.println("result: " + initialIdealOutputs[row][0]);
-            testIdealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
-        }
-
+    private double test(double[][] testInput, double[][] testIdealOutputs) {
         double estim = 0.0;
+        double mse = 0.0;
 
         for (int i = 0; i < testInput.length; i++) {
-            estim += bettas[0][0];
-
             for (int j = 0; j < testInput[0].length; j++) {
-                estim += bettas[j + 1][0] * testInput[i][j];
+                estim += bettas[j][0] * testInput[i][j];
             }
 
-            int resultMax = 1238;
-            double resultMean = 99.3;
-            double error = (testIdealOutputs[i][0] - estim) / resultMean;
-            System.out.println("Ideal:\t" + testIdealOutputs[i][0] + ", Estim:\t" + estim + ", Error:\t" + error);
+            mse += Math.pow(testIdealOutputs[i][0] - estim, 2);
+
             estim = 0;
+
+            /*double resultMean = 99.3;
+            double error = (testIdealOutputs[i][0] - estim) / resultMean;
+            System.out.println("Ideal:\t" + testIdealOutputs[i][0] + ", Estim:\t" + estim + ", Error:\t" + String.format("%4.4f", error));
+            estim = 0;*/
         }
+
+        return mse / testInput.length;
     }
 
-    private void findBettas(String[][] initialInput, String[][] initialIdealOutputs) {
-        double[][] input = new double[initialInput.length][];
-        double[][] idealOutputs = new double[initialIdealOutputs.length][];
-        int columnsN = initialInput[0].length + 1;
-
-        for (int row = 0; row < initialInput.length; row++) {
-            input[row] = new double[columnsN];// 1 1 1 1 - vector
-            idealOutputs[row] = new double[1];
-            input[row][0] = 1;
-
-            for (int feature = 1; feature < columnsN; feature++) {
-                System.out.print(initialInput[row][feature - 1] + ",\t");
-                input[row][feature] = Double.valueOf(initialInput[row][feature - 1]);
-            }
-
-            System.out.println("result: " + initialIdealOutputs[row][0]);
-            idealOutputs[row][0] = Double.valueOf(initialIdealOutputs[row][0]);
-        }
-
+    private void findBettas(double[][] input, double[][] idealOutputs) {
         double[][] transpInput = transp(input);
         double[][] invertMatr = findInvertibleMatr(multMatrices(transpInput, input));
         bettas = multMatrices(multMatrices(invertMatr, transpInput), idealOutputs);
@@ -137,9 +128,44 @@ public class Model {
         new Model();
     }
 
-    private void readInput(int countOfRows, int position) {
-        initialInput = new String[countOfRows][];
-        initialIdealOutputs = new String[countOfRows][1];
+    private Object[] transformData(Object[] stringData, int featuresN) {
+        Object[] result = new Object[2];
+        String[][] stringInput = (String[][]) stringData[0];
+        String[][] stringOutput = (String[][]) stringData[1];
+
+        double[][] input = new double[stringInput.length][featuresN + 1];
+        double[][] idealOutputs = new double[stringOutput.length][1];
+
+        for (int row = 0; row < stringInput.length; row++) {
+            int last = Math.min(stringInput[0].length, featuresN);
+            input[row][0] = 1;// 1 1 1 1 - vector
+
+            for (int feature = 0; feature < last; feature++) {
+                input[row][feature + 1] = Double.valueOf(stringInput[row][feature]);
+            }
+
+            int featureIdx = last + 1;// 1 1 1 1 - vector
+            int idx = 1;
+            while (featureIdx < featuresN + 1) {//заполняем квадратами предыдущих признаков, начиная с [1]
+                input[row][featureIdx] = Math.pow(input[row][idx], 2);
+                featureIdx++;
+                idx++;
+            }
+
+            System.out.println("result: " + stringOutput[row][0]);
+            idealOutputs[row][0] = Double.valueOf(stringOutput[row][0]);
+        }
+
+        result[0] = input;
+        result[1] = idealOutputs;
+
+        return result;
+    }
+
+    private Object[] readInput(int countOfRows, int position) {
+        Object[] result = new Object[2];
+        String[][] initialInput = new String[countOfRows][];
+        String[][] initialIdealOutputs = new String[countOfRows][1];
         Scanner scanner = null;
         try {
             scanner = new Scanner(new File("D:\\Magistracy\\DES\\machine learning project\\machine.data"));
@@ -156,6 +182,7 @@ public class Model {
             }
 
             for (int i = 0; i < countOfRows; i++) {
+                int featuresN = 7;
                 initialInput[i] = new String[featuresN];
                 String[] tempArray = scanner.nextLine().split(",");
 
@@ -166,5 +193,10 @@ public class Model {
                 initialIdealOutputs[i][0] = tempArray[featuresN + 2];
             }
         }
+
+        result[0] = initialInput;
+        result[1] = initialIdealOutputs;
+
+        return result;
     }
 }
