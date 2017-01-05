@@ -17,6 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".NNetworkActivity">
+        </activity>
+        <activity android:name=".LinearActivity">
+        </activity>
     </application>
 
 </manifest>

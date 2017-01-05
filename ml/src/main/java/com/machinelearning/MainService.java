@@ -14,21 +14,19 @@ import java.util.List;
 @Singleton
 @Path("/result")
 public class MainService {
-    Program tool;
     Model model;
 
     public MainService() {
-        tool = new Program();
         model = new Model();
     }
 
     @RolesAllowed("ADMIN")
     @GET
-    @Path("/accuracy")
+    @Path("/train-err")
     @Produces("text/plain")
-    public String getAccuracy() {
+    public String getTrainErrors() {
         //
-        ArrayList<Double> list = tool.getAccuracy();
+        ArrayList<Double> list = model.getTrainErrors();
         /*= new ArrayList<>();
         list.add(10.0);
         list.add(15.0);
@@ -51,10 +49,10 @@ public class MainService {
 
     @RolesAllowed("ADMIN")
     @GET
-    @Path("/precision")
+    @Path("/validation-err")
     @Produces("text/plain")
-    public String getPrecision() {
-        ArrayList<Double> list = tool.getPrecision();
+    public String getValidationErrors() {
+        ArrayList<Double> list = model.getValidationErrors();
         String json = new Gson().toJson(list);
 
         return json;

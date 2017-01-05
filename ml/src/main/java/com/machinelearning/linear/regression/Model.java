@@ -199,4 +199,12 @@ public class Model {
 
         return result;
     }
+
+    public ArrayList<Double> getTrainErrors() {
+        return trainErrors;
+    }
+
+    public ArrayList<Double> getValidationErrors() {
+        return validationErrors;
+    }
 }
