@@ -26,8 +26,8 @@ public class Model {
             double trainError = 0.0;
             double validationError = 0.0;
 
-            int position = 0;
             int inputCount = ALL_ROWS_N / 2; // half
+            int position = inputCount;
             Object[] inputAndOutput = transformData(readInput(inputCount, position), featuresN);
             double[][] input = (double[][]) inputAndOutput[0];
             double[][] output = (double[][]) inputAndOutput[1];
@@ -35,13 +35,13 @@ public class Model {
 
             int countOfCalculations = inputCount / 2; // half half
             for (int j = 0; j < countOfCalculations; j++) {
-                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, j), featuresN);
+                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, position + j), featuresN);
                 input = (double[][]) inputAndOutput[0];
                 output = (double[][]) inputAndOutput[1];
                 trainError += test(input, output);
 
-                position = inputCount;
-                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, position + countOfCalculations), featuresN);
+                position = j;
+                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, j), featuresN);
                 input = (double[][]) inputAndOutput[0];
                 output = (double[][]) inputAndOutput[1];
                 validationError += test(input, output);
