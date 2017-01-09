@@ -1,5 +1,7 @@
 package com.machinelearning.nn;
 
+import java.util.ArrayList;
+
 public class NNetwork {
 
     protected double globalError;
@@ -55,7 +57,6 @@ public class NNetwork {
         double err = Math.sqrt(globalError / (len * outputCount));
         globalError = 0; // clear the accumulator
         return err;
-
     }
 
     //activation func
@@ -180,12 +181,12 @@ public class NNetwork {
             }
         }
 //        2. PRE4: Forced vital capacity - FVC (numeric)
-        double fvcMean = 3.28163;//3.281638298;
-        input[7] = Double.valueOf(initialInput[1]) / 6.3; // (value - MO)
+        double fvcMax = 6.3;//3.281638298;
+        input[7] = Double.valueOf(initialInput[1]) / fvcMax;
 
 //        3. PRE5: Volume that has been exhaled at the end of the first second of forced expiration - FEV1 (numeric)
-        double volumeMean = 4.56870;//4.568702128;
-        input[8] = (Double.valueOf(initialInput[2])) / 86.3; // (value - MO)
+        double volumeMax = 86.3;//4.568702128;
+        input[8] = (Double.valueOf(initialInput[2])) / volumeMax;
 
 //        4. PRE6: Performance status - Zubrod scale (PRZ2,PRZ1,PRZ0)
         switch (initialInput[3]) {//TODO: мб поменять порядок
@@ -308,9 +309,8 @@ public class NNetwork {
         }
 
 //        16. AGE: Age at surgery (numeric)
-        double ageMean = 62.53404;//62.53404255;
-        input[31] = Double.valueOf(initialInput[15]) / 87; // (value - MO)
-
+        double maxAge = 87;//double ageMean = 62.53404;
+        input[31] = Double.valueOf(initialInput[15]) / maxAge;
 
         return input;
     }
@@ -327,6 +327,66 @@ public class NNetwork {
         return output;
     }
 
+    public Object[] makeDataBalanced(String[][] in, String[][] out) {
+        Object[] corrected = new Object[2];
+        int countOfDeathes = 0;
+        int tempT = 0;
+        int tempF = 0;
+
+        for (int i = 0; i < out.length; i++) {
+            if (out[i][0].equals("T")) {//death
+                countOfDeathes++;
+                tempT++;
+            } else {
+                tempF++;
+            }
+        }
+
+        System.out.println("--ini deathes: " + tempT);
+        System.out.println("--ini survives: " + tempF);
+        tempF = 0;
+        tempT = 0;
+
+
+        //балансируем данные только если надо
+        if (out.length > countOfDeathes * 2) {
+            ArrayList<Integer> indexesToRemove = new ArrayList<>();
+            String[][] input = new String[countOfDeathes * 2][in[0].length];
+            String[][] output = new String[countOfDeathes * 2][1];
+            int countOfRemoving = out.length - countOfDeathes * 2;
+
+            while (indexesToRemove.size() < countOfRemoving) {
+                int k = (int)(Math.random() * out.length);
+
+                if (out[k][0].equals("F")) {// survive
+                    indexesToRemove.add(k);
+                }
+            }
+
+
+            int idx = 0;
+            for (int i = 0; i < out.length; i++) {
+                if (!indexesToRemove.contains(i) && idx < input.length) {
+                    input[idx] = in[i];
+                    output[idx] = out[i];
+                    idx++;
+                    if (out[i][0].equals("F")) {
+                        tempF++;
+                    } else {
+                        tempT++;
+                    }
+                }
+            }
+
+            System.out.println("deathes: " + tempT);
+            System.out.println("survives: " + tempF);
+
+            corrected[0] = input;
+            corrected[1] = output;
+        }
+
+        return corrected;
+    }
 
     //ошибка на только вычисленных данных
     public void calcError(double ideal[]) {
@@ -352,7 +412,7 @@ public class NNetwork {
         for (i = outputIndex; i < neuronCount; i++) {
             for (j = hiddenIndex; j < outputIndex; j++) {
                 accMatrixDelta[winx] += errorDelta[i] * fire[j];
-                error[j] += matrix[winx] * errorDelta[i];
+                error[j] += matrix[winx] * errorDelta[i];//ошибка кот-я пришла к нам от i-ого выходн. нейрона
                 winx++;
             }
             accThresholdDelta[i] += errorDelta[i];
@@ -360,7 +420,7 @@ public class NNetwork {
 
         // hidden layer deltas
         for (i = hiddenIndex; i < outputIndex; i++) {
-            errorDelta[i] = error[i] * fire[i] * (1 - fire[i]);
+            errorDelta[i] = error[i] * fire[i] * (1 - fire[i]);//текущая ошибка для именно этого нейрона скрытого слоя
         }
 
         // input layer errors

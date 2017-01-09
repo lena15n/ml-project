@@ -41,7 +41,6 @@ public class MainService {
         list.add(35.0);
         list.add(2.0);*/
 
-        //TODO: return result of calculations
         String json = new Gson().toJson(list);
 
         return json;
