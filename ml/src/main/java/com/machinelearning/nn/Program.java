@@ -44,12 +44,12 @@ public class Program {
         tempTP = new ArrayList<>();
         tempFP = new ArrayList<>();
 
-        calculateForNrows(100);
-        calculateForNrows(150);
+       // calculateForNrows(100);
+       // calculateForNrows(150);
         calculateForNrows(200);
-        calculateForNrows(250);
-        calculateForNrows(300);
-        calculateForNrows(350);
+       // calculateForNrows(250);
+       // calculateForNrows(300);
+       // calculateForNrows(350);
 
     }
 
@@ -58,7 +58,7 @@ public class Program {
         String[][] initialInput = (String[][]) tempData[0];
         String[][] initialIdealOutputs = (String[][]) tempData[1];
 
-        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.3, 0.7);//0.2, 0.01);
+        NNetwork network = new NNetwork(FEATURES_N, FEATURES_N, 1, 0.35, 0.4);//0.2, 0.01);
         Object[] newData = network.makeDataBalanced(initialInput, initialIdealOutputs);
         String[][] balancedInput = (String[][])newData[0];
         String[][] balancedOutput = (String[][])newData[1];
@@ -73,14 +73,19 @@ public class Program {
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
         percentFormat.setMinimumFractionDigits(4);
 
-        for (int i = 0; i < 7000; i++) {//500 000
+        double eps = 100.0;
+        int k = 0;
+        while (eps > 0.05) {// 10%
+        //for (int i = 0; i < 7000; i++) {//500 000
             for (int j = 0; j < input.length; j++) {
                 network.computeOutputs(input[j]);
                 network.calcError(idealOutputs[j]);
                 network.learn();
             }
-            System.out.println("Iter №" + i + ": error = " +
-                    percentFormat.format(network.getError(input.length)));
+            eps = network.getError(input.length);
+            System.out.println("Iter №" + k + ": error = " +
+                    percentFormat.format(eps));
+            k++;
         }
 
 

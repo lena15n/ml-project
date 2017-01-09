@@ -23,25 +23,35 @@ public class Model {
         int maxFeaturesN = 14;
 
         for (int featuresN = 1; featuresN < maxFeaturesN; featuresN++) {
+            double trainError = 0.0;
+            double validationError = 0.0;
+
             int position = 0;
-            int inputCount = ALL_ROWS_N * 3 / 4;
+            int inputCount = ALL_ROWS_N / 2; // half
             Object[] inputAndOutput = transformData(readInput(inputCount, position), featuresN);
             double[][] input = (double[][]) inputAndOutput[0];
             double[][] output = (double[][]) inputAndOutput[1];
             findBettas(input, output);
 
-            inputAndOutput = transformData(readInput(ALL_ROWS_N - inputCount, position), featuresN);
-            input = (double[][]) inputAndOutput[0];
-            output = (double[][]) inputAndOutput[1];
-            trainErrors.add((double) featuresN);
-            trainErrors.add(test(input, output));
+            int countOfCalculations = inputCount / 2; // half half
+            for (int j = 0; j < countOfCalculations; j++) {
+                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, j), featuresN);
+                input = (double[][]) inputAndOutput[0];
+                output = (double[][]) inputAndOutput[1];
+                trainError += test(input, output);
 
-            position = inputCount;
-            inputAndOutput = transformData(readInput(ALL_ROWS_N - inputCount, position), featuresN);
-            input = (double[][]) inputAndOutput[0];
-            output = (double[][]) inputAndOutput[1];
+                position = inputCount;
+                inputAndOutput = transformData(readInput(ALL_ROWS_N / 4, position + countOfCalculations), featuresN);
+                input = (double[][]) inputAndOutput[0];
+                output = (double[][]) inputAndOutput[1];
+                validationError += test(input, output);
+            }
+
+            trainErrors.add((double) featuresN);
+            trainErrors.add(trainError / countOfCalculations);
+
             validationErrors.add((double) featuresN);
-            validationErrors.add(test(input, output));
+            validationErrors.add(validationError / countOfCalculations);
         }
         System.out.println("--finish--");
     }
@@ -102,11 +112,11 @@ public class Model {
         return transpMatr;
     }
 
-    private double[][] multMatrices (double[][] matrA, double[][] matrB) {
+    private double[][] multMatrices(double[][] matrA, double[][] matrB) {
         double[][] multMatr = new double[matrA.length][matrB[0].length];
 
         for (int i = 0; i < matrA.length; i++) {
-            for (int j = 0; j < matrB[0].length; j++){
+            for (int j = 0; j < matrB[0].length; j++) {
                 double sum = 0.0;
 
                 for (int k = 0; k < matrA[0].length; k++) { // or matrB.len
