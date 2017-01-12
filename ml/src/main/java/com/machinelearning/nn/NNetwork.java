@@ -358,7 +358,7 @@ public class NNetwork {
             while (indexesToRemove.size() < countOfRemoving) {
                 int k = (int)(Math.random() * out.length);
 
-                if (out[k][0].equals("F")) {// survive
+                if (out[k][0].equals("F") && !indexesToRemove.contains(k)) {// survive
                     indexesToRemove.add(k);
                 }
             }

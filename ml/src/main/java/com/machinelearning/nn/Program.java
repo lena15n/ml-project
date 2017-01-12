@@ -20,8 +20,7 @@ public class Program {
     private static ArrayList<Double> recall;
     private static ArrayList<Double> f1Score;
 
-    private static ArrayList<Double> tempTP;
-    private static ArrayList<Double> tempFP;
+    private static ArrayList<Double> rocCurve;
 
     public Program() {
         try {
@@ -41,8 +40,7 @@ public class Program {
         recall = new ArrayList<>();
         f1Score = new ArrayList<>();
 
-        tempTP = new ArrayList<>();
-        tempFP = new ArrayList<>();
+        rocCurve = new ArrayList<>();
 
        // calculateForNrows(100);
        // calculateForNrows(150);
@@ -75,7 +73,9 @@ public class Program {
 
         double eps = 100.0;
         int k = 0;
-        while (eps > 0.05) {// 10%
+        double needEps = 0.13;// 0.05   //12%
+
+        while (eps > needEps) {
         //for (int i = 0; i < 7000; i++) {//500 000
             for (int j = 0; j < input.length; j++) {
                 network.computeOutputs(input[j]);
@@ -88,7 +88,6 @@ public class Program {
             k++;
         }
 
-
         /* validation */
         double[][] out = new double[VALIDATION_COUNT][];
         int position = ALL_ROWS_N - VALIDATION_COUNT;
@@ -96,47 +95,76 @@ public class Program {
         String[][] testInput =(String[][])testData[0];
         String[][] testOutput = (String[][])testData[1];
 
-        int tp = 0, fp = 0, fn = 0, tn = 0;
+        Object[] newTestData = network.makeDataBalanced(testInput, testOutput);
+        String[][] balancedTestInput = (String[][])newTestData[0];
+        String[][] balancedTestOutput = (String[][])newTestData[1];
+        double[][] inputTest = new double[balancedTestInput.length][FEATURES_N];
+        double[][] idealOutputsTest = new double[balancedTestOutput.length][1];
 
-        for (int i = 0; i < testInput.length; i++) {
+        for (int i = 0; i < balancedTestInput.length; i++) {
+            inputTest[i] = network.normalizeInputData(balancedTestInput[i]);
+            idealOutputsTest[i] = network.normalizeOutputData(balancedTestOutput[i]);
+        }
+
+        //int tp = 0, fp = 0, fn = 0, tn = 0;
+        int alphaLength = 11;
+        double[] tp = new double[alphaLength];
+        double[] fp = new double[alphaLength];
+        double[] fn = new double[alphaLength];
+        double[] tn = new double[alphaLength];
+        double[] alphaArr = new double[alphaLength];
+
+        for (int i = 0; i < inputTest.length; i++) {
             out[i] = new double[1];
-            out[i] = network.computeOutputs(network.normalizeInputData(testInput[i]));
+            out[i] = network.computeOutputs(inputTest[i]);
             System.out.println("=" + String.format("%4.4f", out[i][0]));
-            double[] testOut = network.normalizeOutputData(testOutput[i]);
+            double[] testOut = idealOutputsTest[i];
 
-            if (out[i][0] > 0.5 && testOut[0] < 0.5) {// predict: death, real: survive
-                fp++;
-            } else if (out[i][0] > 0.5 && testOut[0] > 0.5) {// predict: death, real: death
-                tp++;
-            } else if (out[i][0] < 0.5 && testOut[0] > 0.5) {// predict: survive, real: death
-                fn++;
-            } else if (out[i][0] < 0.5 && testOut[0] < 0.5) {// predict: survive, real: survive
-                tn++;
+            for (double alpha = 1.0, idx = 0.0; alpha >= 0.0; alpha -= 0.1, idx += 1.0) {
+                int intIdx = (int) idx;
+                alphaArr[intIdx] = alpha;
+
+                if (out[i][0] > alpha && testOut[0] < alpha) {// predict: death, real: survive
+                    fp[intIdx] = fp[intIdx] + 1;
+                } else if (out[i][0] > alpha && testOut[0] > alpha) {// predict: death, real: death
+                    tp[intIdx] = tp[intIdx] + 1;
+                } else if (out[i][0] < alpha && testOut[0] > alpha) {// predict: survive, real: death
+                    fn[intIdx] = fn[intIdx] + 1;
+                } else if (out[i][0] < alpha && testOut[0] < alpha) {// predict: survive, real: survive
+                    tn[intIdx] = tn[intIdx] + 1;
+                }
             }
         }
 
-        //accuracy = (TP+TN) / (TP+TN+FP+FN)
-        accuracy.add((double)nRows);
-        accuracy.add(((tp + tn) * 1.0) / (tp + tn + fp + fn));
-        System.out.println("accur: " + accuracy.get(1));
+        //int alphaIdx = 5;
+        for (int alphaIdx = 1; alphaIdx < alphaLength; alphaIdx++) {
+            //accuracy = (TP+TN) / (TP+TN+FP+FN)
+            accuracy.add(alphaArr[alphaIdx]);
+            accuracy.add(((tp[alphaIdx] + tn[alphaIdx]) * 1.0) / (tp[alphaIdx] + tn[alphaIdx] + fp[alphaIdx] + fn[alphaIdx]));
+            System.out.println("accur: " + accuracy.get(1));
 
-        //precision = TP / (TP+FP) (positive predictive value)
-        precision.add((double)nRows);
-        precision.add((tp * 1.0) / (tp + fp));
-        System.out.println("prec: " + precision.get(1));
+            //precision = TP / (TP+FP) (positive predictive value)
+            precision.add(alphaArr[alphaIdx]);
+            precision.add((tp[alphaIdx] * 1.0) / (tp[alphaIdx] + fp[alphaIdx]));
+            System.out.println("prec: " + precision.get(1));
 
-        //recall = TP / (TP+FN)
-        recall.add((double)nRows);
-        recall.add((tp * 1.0) / (tp + fn));
-        System.out.println("recall: " + recall.get(1));
+            //recall = TP / (TP+FN)
+            recall.add(alphaArr[alphaIdx]);
+            recall.add((tp[alphaIdx] * 1.0) / (tp[alphaIdx] + fn[alphaIdx]));
+            System.out.println("recall: " + recall.get(1));
 
-        //recall = TP / (TP+FN)
-        f1Score.add((double)nRows);
-        f1Score.add((2.0 * precision.get(0) * recall.get(0)) / (precision.get(0) + recall.get(0)));
-        System.out.println("F1Score: " + f1Score.get(1));
+            //recall = TP / (TP+FN)
+            f1Score.add(alphaArr[alphaIdx]);
+            f1Score.add((2.0 * precision.get(0) * recall.get(0)) / (precision.get(0) + recall.get(0)));
+            System.out.println("F1Score: " + f1Score.get(1));
 
-        tempTP.add((double)tp);
-        tempFP.add((double)fp);
+            rocCurve.add((fp[alphaIdx] * 1.0) / (fp[alphaIdx] + tn[alphaIdx]));
+            rocCurve.add(recall.get(recall.size() - 1));
+        }
+    }
+
+    public static ArrayList<Double> getRocCurve() {
+        return rocCurve;
     }
 
     public static ArrayList<Double> getAccuracy() {

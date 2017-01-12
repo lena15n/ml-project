@@ -22,6 +22,17 @@ public class ServiceForNN {
 
     @RolesAllowed("ADMIN")
     @GET
+    @Path("/roc")
+    @Produces("text/plain")
+    public String getROC() {
+        ArrayList<Double> list = Program.getRocCurve();
+        String json = new Gson().toJson(list);
+
+        return json;
+    }
+
+    @RolesAllowed("ADMIN")
+    @GET
     @Path("/accuracy")
     @Produces("text/plain")
     public String getAccuracy() {

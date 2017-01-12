@@ -43,7 +43,7 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/chart_precision_layout"
+                android:id="@+id/chart_roc_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/chart_accuracy_layout"
@@ -51,7 +51,7 @@
                 android:visibility="invisible">
 
                 <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/chart_precision"
+                    android:id="@+id/chart_roc"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"/>
             </RelativeLayout>

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class LinearActivity extends AppCompatActivity implements GetTask.MyAsyncResponse {
     private static final String RECEIVE_TRAIN_ERR_DATA = "3";
     private static final String RECEIVE_VALID_ERR_DATA = "4";
-    private static final String URL = "http://b7293f78.ngrok.io/machinelearning-0.0.1-SNAPSHOT/machine-learning/result/";
+    private static final String URL = "http://dccbc4b4.ngrok.io/machinelearning-0.0.1-SNAPSHOT/machine-learning/result/";
     private static final String LOGIN = "user";
     private static final String PASSWORD = "admin";
     private ArrayList<Double> trainErrorsData;
